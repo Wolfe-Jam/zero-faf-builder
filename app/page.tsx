@@ -10,14 +10,14 @@ import {
 } from '@/components/ui/hover-card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Copy, Check, Leaf, Github, Folder, Loader2, Info } from 'lucide-react'
+import { Copy, Check, Leaf, Github, Folder, Info } from 'lucide-react'
 
 export default function Home() {
   const [showLocalModal, setShowLocalModal] = useState(false)
   const [showGithubModal, setShowGithubModal] = useState(false)
   const [githubUrl, setGithubUrl] = useState('')
   const [copied, setCopied] = useState(false)
-  const [isDownloading, setIsDownloading] = useState(false)
+  const [copiedGithub, setCopiedGithub] = useState(false)
   const [urlError, setUrlError] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -39,33 +39,44 @@ export default function Home() {
     }
   }
 
-  const handleGithubDownload = async () => {
-    setUrlError('')
-    
-    if (!githubUrl) {
-      setUrlError('Please enter a GitHub URL')
-      return
-    }
-
+  const getGithubCommands = () => {
+    if (!githubUrl) return ''
     try {
       const url = new URL(githubUrl)
-      if (!url.hostname.includes('github.com')) {
-        setUrlError('Please enter a valid GitHub URL')
-        return
-      }
-    } catch (e) {
-      setUrlError('Invalid URL format')
+      const pathParts = url.pathname.split('/').filter(Boolean)
+      const repoName = pathParts[1] || 'repo'
+      return `git clone ${githubUrl}
+cd ${repoName}
+npx grok-faf-mcp init
+git add . && git commit -m "Add FAF" && git push`
+    } catch {
+      return ''
+    }
+  }
+
+  const copyGithubCommands = async () => {
+    const commands = getGithubCommands()
+    if (!commands) {
+      setUrlError('Please enter a valid GitHub URL')
       return
     }
+    try {
+      await navigator.clipboard.writeText(commands)
+      setCopiedGithub(true)
+      setTimeout(() => setCopiedGithub(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
 
-    setIsDownloading(true)
-    
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsDownloading(false)
-    setShowGithubModal(false)
-    setGithubUrl('')
-    setUrlError('')
+  const validateGithubUrl = (url: string) => {
+    if (!url) return false
+    try {
+      const parsed = new URL(url)
+      return parsed.hostname.includes('github.com')
+    } catch {
+      return false
+    }
   }
 
   return (
@@ -241,15 +252,15 @@ export default function Home() {
                     <div className="text-sm space-y-1">
                       <div className="flex gap-2">
                         <span className="font-bold text-primary">A.</span>
-                        <span>Copy repo URL</span>
+                        <span>Paste your repo URL</span>
                       </div>
                       <div className="flex gap-2">
                         <span className="font-bold text-primary">B.</span>
-                        <span>Paste in modal</span>
+                        <span>Copy the generated commands</span>
                       </div>
                       <div className="flex gap-2">
                         <span className="font-bold text-primary">C.</span>
-                        <span>Analyze in cloud</span>
+                        <span>Run in terminal to add FAF</span>
                       </div>
                     </div>
                   </div>
@@ -341,7 +352,7 @@ export default function Home() {
           <DialogHeader>
             <DialogTitle className="text-2xl">Add FAF to Your GitHub Repo</DialogTitle>
             <DialogDescription>
-              Enter your GitHub repository URL to download it with project.faf injected
+              Enter your repo URL to get the commands for adding FAF
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
@@ -356,9 +367,6 @@ export default function Home() {
                   setUrlError('')
                 }}
                 data-testid="input-github-url"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleGithubDownload()
-                }}
                 className={urlError ? 'border-red-500' : ''}
               />
               {urlError && (
@@ -367,28 +375,38 @@ export default function Home() {
                 </p>
               )}
             </div>
-            <Button
-              className="w-full bg-primary hover:bg-primary/90"
-              onClick={handleGithubDownload}
-              disabled={!githubUrl || isDownloading}
-              data-testid="btn-download-github"
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Injecting FAF...
-                </>
-              ) : (
-                'Download ZIP with project.faf'
-              )}
-            </Button>
+            {validateGithubUrl(githubUrl) && (
+              <div className="space-y-2">
+                <Label>Commands</Label>
+                <div className="flex gap-2">
+                  <pre className="flex-1 bg-muted p-3 rounded-lg text-sm font-mono overflow-x-auto whitespace-pre">
+                    {getGithubCommands()}
+                  </pre>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={copyGithubCommands}
+                    className="shrink-0 self-start"
+                    title={copiedGithub ? 'Copied!' : 'Copy to clipboard'}
+                    data-testid="btn-copy-github"
+                  >
+                    {copiedGithub ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                </div>
+                {copiedGithub && (
+                  <p className="text-sm text-green-500 animate-in fade-in">
+                    ✓ Commands copied to clipboard!
+                  </p>
+                )}
+              </div>
+            )}
             <div className="bg-muted p-4 rounded-lg space-y-2">
-              <p className="text-sm font-semibold">What you'll get:</p>
+              <p className="text-sm font-semibold">What these commands do:</p>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li>Your complete repository code</li>
-                <li>project.faf pre-configured at root</li>
-                <li>Grok MCP integration ready</li>
-                <li>Zero manual setup required</li>
+                <li>Clone your repository locally</li>
+                <li>Initialize FAF with Grok MCP integration</li>
+                <li>Commit and push project.faf to GitHub</li>
+                <li>Ready for AI-assisted development</li>
               </ul>
             </div>
           </div>
