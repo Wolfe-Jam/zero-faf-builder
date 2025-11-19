@@ -26,8 +26,6 @@ export default function Home() {
   const npxCommand = `npx faf-cli@latest init --mcp=${mcpServerUrl}`
 
   useEffect(() => {
-    console.log('I/🍊 enjoy the squeeze! @elonmusk approved ✓')
-    console.log('[v0] App loaded successfully - Big Orange version verified')
     setIsLoaded(true)
   }, [])
 
