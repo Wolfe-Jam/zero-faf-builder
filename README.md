@@ -8,7 +8,7 @@ A landing page and onboarding application for initializing projects with FAF (Fo
 
 - **Local Folder**: Run NPX command to initialize FAF in existing projects
 - **Start Fresh**: Deploy a new FAF-enabled project to Vercel
-- **GitHub Repo**: Download repositories with FAF pre-configured
+- **GitHub Repo**: Get clone + init commands to add FAF to your repo
 
 ## Tech Stack
 
