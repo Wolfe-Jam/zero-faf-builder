@@ -2,8 +2,8 @@
 
 **This repo is archived.** The Next.js/React version has been replaced by the SvelteKit edition:
 
-- **Active Repo**: [zero-faf-builder-amg](https://github.com/Wolfe-Jam/zero-faf-builder-amg) (SvelteKit + Svelte 5)
-- **Live Site**: https://zero-faf-builder-amg.vercel.app/
+- **Active Repo**: [grok-faf-elite](https://github.com/Wolfe-Jam/grok-faf-elite) (SvelteKit + Svelte 5)
+- **Live Site**: https://grok-faf-elite.vercel.app/
 
 This repository is kept for reference and historical purposes. Not actively maintained.
 
