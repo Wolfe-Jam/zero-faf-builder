@@ -1,3 +1,14 @@
+# ⚠️ ARCHIVED - Reference Only
+
+**This repo is archived.** The Next.js/React version has been replaced by the SvelteKit edition:
+
+- **Active Repo**: [zero-faf-builder-amg](https://github.com/Wolfe-Jam/zero-faf-builder-amg) (SvelteKit + Svelte 5)
+- **Live Site**: https://zero-faf-builder-amg.vercel.app/
+
+This repository is kept for reference and historical purposes. Not actively maintained.
+
+---
+
 # Zero-FAF-Builder
 
 Zero faff from day zero — Grok-ready in one click.
